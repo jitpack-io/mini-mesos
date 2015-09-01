@@ -3,21 +3,14 @@ package org.apache.mesos.mini.mesos;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.CreateContainerCmd;
 import com.github.dockerjava.api.model.Bind;
-import com.github.dockerjava.api.model.Container;
 import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.Link;
 import com.github.dockerjava.api.model.Volume;
-import com.github.dockerjava.core.DockerClientBuilder;
-import com.github.dockerjava.core.DockerClientConfig;
-import com.mashape.unirest.http.Unirest;
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.HttpHost;
 import org.apache.log4j.Logger;
 import org.apache.mesos.mini.container.AbstractContainer;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
-import java.util.List;
 
 public class MesosContainer extends AbstractContainer {
 
@@ -79,15 +72,15 @@ public class MesosContainer extends AbstractContainer {
 
     @Override
     public void remove() {
-        DockerClientConfig.DockerClientConfigBuilder innerDockerConfigBuilder = DockerClientConfig.createDefaultConfigBuilder();
-        innerDockerConfigBuilder.withUri("http://" + getIpAddress() + ":2376");
-        DockerClient innerDockerClient = DockerClientBuilder.getInstance(innerDockerConfigBuilder.build()).build();
-
-        List<Container> innerContainers = innerDockerClient.listContainersCmd().exec();
-        for (Container innerContainer : innerContainers) {
-            LOGGER.info("Removing Mesos-Local inner container including volumes: " + innerContainer.getNames()[0]);
-            innerDockerClient.removeContainerCmd(innerContainer.getId());
-        }
+//        DockerClientConfig.DockerClientConfigBuilder innerDockerConfigBuilder = DockerClientConfig.createDefaultConfigBuilder();
+//        innerDockerConfigBuilder.withUri("http://" + getIpAddress() + ":2376");
+//        DockerClient innerDockerClient = DockerClientBuilder.getInstance(innerDockerConfigBuilder.build()).build();
+//
+//        List<Container> innerContainers = innerDockerClient.listContainersCmd().exec();
+//        for (Container innerContainer : innerContainers) {
+//            LOGGER.info("Removing Mesos-Local inner container including volumes: " + innerContainer.getNames()[0]);
+//            innerDockerClient.removeContainerCmd(innerContainer.getId());
+//        }
 
         LOGGER.info("Removing Mesos-Local container");
         super.remove();
