@@ -30,9 +30,9 @@ public class InnerDockerProxy extends AbstractContainer {
     return dockerClient
         .createContainerCmd(DOCKER_IMAGE)
         .withLinks(Link.parse(mesosContainer.getContainerId() + ":docker"))
-        .withExposedPorts(ExposedPort.tcp(mesosContainer.getDockerPort()))
-        .withPortBindings(PortBinding.parse("0.0.0.0:" + getProxyPort() + ":" + mesosContainer.getDockerPort()))
-        .withCmd("-l=:" + mesosContainer.getDockerPort(), "-r=docker:" + mesosContainer.getDockerPort());
+        .withExposedPorts(ExposedPort.tcp(getProxyPort()))
+        .withPortBindings(PortBinding.parse("0.0.0.0:" + mesosContainer.getDockerPort() + ":" + getProxyPort()))
+        .withCmd("-l=:" + getProxyPort(), "-r=docker:" + mesosContainer.getDockerPort());
   }
 
   public int getProxyPort() {
