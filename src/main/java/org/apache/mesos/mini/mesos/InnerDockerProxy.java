@@ -13,7 +13,7 @@ public class InnerDockerProxy extends AbstractContainer {
     public static final String PROXY_IMAGE = "paintedfox/tinyproxy";
     public static final String CONTAINER_NAME = "innerDockerProxy";
     public static final String TAG = "latest";
-    private static final int PROXY_PORT = 2377;
+    private static final int PROXY_PORT = 8888;
 
     private MesosContainer mesosContainer;
 
@@ -33,7 +33,7 @@ public class InnerDockerProxy extends AbstractContainer {
                 .createContainerCmd(PROXY_IMAGE + ":" + TAG)
                 .withName(generateRegistryContainerName())
                 .withExposedPorts(ExposedPort.parse("" + getProxyPort()))
-                .withPortBindings(PortBinding.parse("0.0.0.0:" + getProxyPort() + ":" + mesosContainer.getDockerPort()));
+                .withPortBindings(PortBinding.parse("0.0.0.0:" + mesosContainer.getDockerPort() + ":" + getProxyPort()));
     }
 
     String generateRegistryContainerName() {
