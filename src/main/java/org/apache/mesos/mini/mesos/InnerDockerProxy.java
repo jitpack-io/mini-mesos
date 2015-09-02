@@ -33,7 +33,7 @@ public class InnerDockerProxy extends AbstractContainer {
                 .createContainerCmd(PROXY_IMAGE + ":" + TAG)
                 .withName(generateRegistryContainerName())
                 .withExposedPorts(ExposedPort.parse("" + getProxyPort()))
-                .withPortBindings(PortBinding.parse("0.0.0.0:" + mesosContainer.getDockerPort() + ":" + getProxyPort()));
+                .withPortBindings(PortBinding.parse("0.0.0.0:" + getProxyPort() + ":" + mesosContainer.getDockerPort()));
     }
 
     String generateRegistryContainerName() {
