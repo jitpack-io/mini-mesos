@@ -3,39 +3,44 @@ package org.apache.mesos.mini.mesos;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.CreateContainerCmd;
 import com.github.dockerjava.api.model.ExposedPort;
-import com.github.dockerjava.api.model.Link;
 import com.github.dockerjava.api.model.PortBinding;
 import org.apache.mesos.mini.container.AbstractContainer;
 
+import java.security.SecureRandom;
+
 public class InnerDockerProxy extends AbstractContainer {
 
-  private static final String DOCKER_IMAGE = "mwldk/go-tcp-proxy";
+    public static final String PROXY_IMAGE = "paintedfox/tinyproxy";
+    public static final String CONTAINER_NAME = "innerDockerProxy";
+    public static final String TAG = "latest";
+    private static final int PROXY_PORT = 2377;
 
-  private static final int PROXY_PORT = 2377;
+    private MesosContainer mesosContainer;
 
-  private MesosContainer mesosContainer;
+    public InnerDockerProxy(DockerClient dockerClient, MesosContainer mesosContainer) {
+        super(dockerClient);
+        this.mesosContainer = mesosContainer;
+    }
 
-  public InnerDockerProxy(DockerClient dockerClient, MesosContainer mesosContainer) {
-    super(dockerClient);
-    this.mesosContainer = mesosContainer;
-  }
+    @Override
+    protected void pullImage() {
+        pullImage(PROXY_IMAGE, TAG);
+    }
 
-  @Override
-  protected void pullImage() {
-    pullImage(DOCKER_IMAGE, "latest");
-  }
+    @Override
+    protected CreateContainerCmd dockerCommand() {
+        return dockerClient
+                .createContainerCmd(PROXY_IMAGE + ":" + TAG)
+                .withName(generateRegistryContainerName())
+                .withExposedPorts(ExposedPort.parse("" + getProxyPort()))
+                .withPortBindings(PortBinding.parse("0.0.0.0:" + mesosContainer.getDockerPort() + ":" + getProxyPort()));
+    }
 
-  @Override
-  protected CreateContainerCmd dockerCommand() {
-    return dockerClient
-        .createContainerCmd(DOCKER_IMAGE)
-        .withLinks(Link.parse(mesosContainer.getContainerId() + ":docker"))
-        .withExposedPorts(ExposedPort.tcp(getProxyPort()))
-        .withPortBindings(PortBinding.parse("0.0.0.0:" + mesosContainer.getDockerPort() + ":" + getProxyPort()))
-        .withCmd("-l=:" + getProxyPort(), "-r=docker:" + mesosContainer.getDockerPort());
-  }
+    String generateRegistryContainerName() {
+        return CONTAINER_NAME + "_" + new SecureRandom().nextInt();
+    }
 
-  public int getProxyPort() {
-    return PROXY_PORT;
-  }
+    public int getProxyPort() {
+        return PROXY_PORT;
+    }
 }
